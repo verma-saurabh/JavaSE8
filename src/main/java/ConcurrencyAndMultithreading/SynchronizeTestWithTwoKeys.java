@@ -1,5 +1,8 @@
 package ConcurrencyAndMultithreading;
-
+/*
+In this example the deadlock will occur as when the two threads start their execution
+both will be waiting for each other
+ */
 public class SynchronizeTestWithTwoKeys {
     public static void main(String[] args) throws InterruptedException {
         A a = new A();
