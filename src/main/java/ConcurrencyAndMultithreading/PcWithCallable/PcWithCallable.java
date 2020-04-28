@@ -1,11 +1,9 @@
 package ConcurrencyAndMultithreading.PcWithCallable;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -29,7 +27,9 @@ public class PcWithCallable {
                     try {
                         lock.lock();
                         while (isFull(buffer)) {
-                            isFull.await();
+                            if (!isFull.await(10, TimeUnit.MILLISECONDS)) {
+                                throw new TimeoutException("Producer Timeout");
+                            }
                         }
                         buffer.add(1);
                         isEmpty.signalAll();
@@ -53,7 +53,9 @@ public class PcWithCallable {
 
                         lock.lock();
                         while (isEmpty(buffer)) {
-                            isEmpty.await();
+                            if (!isEmpty.await(10, TimeUnit.MILLISECONDS)) {
+                                throw new TimeoutException("Producer Timeout");
+                            }
                         }
                         buffer.remove(buffer.size() - 1);
                         isFull.signalAll();
@@ -79,7 +81,7 @@ public class PcWithCallable {
         procucersconsumers.addAll(producers);
         procucersconsumers.addAll(consumers);
 
-        ExecutorService executorService = Executors.newFixedThreadPool(8);
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
 
         try {
             List<Future<String>> futures = executorService.invokeAll(procucersconsumers);
