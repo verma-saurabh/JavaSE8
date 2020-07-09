@@ -81,7 +81,7 @@ public class PcWithCallable {
         procucersconsumers.addAll(producers);
         procucersconsumers.addAll(consumers);
 
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
 
         try {
             List<Future<String>> futures = executorService.invokeAll(procucersconsumers);
